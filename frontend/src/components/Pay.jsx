@@ -16,7 +16,7 @@ function Pay() {
 
     try {
       // Step 1: Create order on the server
-      const response = await fetch("http://localhost:5002/order", {
+      const response = await fetch("http://localhost:5001/api/payments/order", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -28,11 +28,12 @@ function Pay() {
         })
       });
 
-      const order = await response.json();
+      const orderData = await response.json();
+      const order = orderData.data || orderData;
 
       // Step 2: Initialize Razorpay checkout
       const options = {
-        key: "rzp_test_WwmlF1M46ivOUV", // Replace with your Razorpay Key ID
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: order.amount,
         currency: order.currency,
         name: "Acme Corp",
@@ -40,7 +41,7 @@ function Pay() {
         image: "https://example.com/your_logo",
         order_id: order.id,
         handler: async function (response) {
-          const validateRes = await fetch("http://localhost:5002/order/validate", {
+          const validateRes = await fetch("http://localhost:5001/api/payments/validate", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -54,7 +55,7 @@ function Pay() {
 
           const validate = await validateRes.json();
 
-          if (validate.msg === "Payment Successful") {
+          if (validate.success || validate.message === "Payment Successful") {
             alert("✅ Payment successful!");
           } else {
             alert("❌ Payment verification failed.");

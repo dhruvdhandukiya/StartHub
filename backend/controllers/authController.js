@@ -44,6 +44,7 @@ exports.register = async (req, res) => {
           role: user.role,
           domain: user.domain,
           isSubscribed: user.isSubscribed,
+          subscription: user.subscription,
           token: generateToken(user._id)
         }
       });
@@ -77,6 +78,7 @@ exports.login = async (req, res) => {
           role: user.role,
           domain: user.domain,
           isSubscribed: user.isSubscribed,
+          subscription: user.subscription,
           token: generateToken(user._id)
         }
       });

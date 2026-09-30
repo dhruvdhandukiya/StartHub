@@ -647,7 +647,7 @@ const Chat = () => {
 
       // Step 2: Open Razorpay checkout
       const options = {
-        key: 'rzp_test_WwmlF1M46ivOUV', // Replace with env variable
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: order.amount,
         currency: order.currency,
         name: 'Fund Transfer',

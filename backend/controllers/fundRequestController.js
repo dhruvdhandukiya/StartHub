@@ -297,7 +297,7 @@ exports.processFundRequestPayment = async (req, res) => {
 
     // Validate payment signature
     const crypto = require('crypto');
-    const key_secret = process.env.RAZORPAY_KEY_SECRET || 'test_key_secret_need_real_one';
+    const key_secret = process.env.RAZORPAY_KEY_SECRET;
     const generated_signature = crypto
       .createHmac('sha256', key_secret)
       .update(razorpay_order_id + "|" + razorpay_payment_id)

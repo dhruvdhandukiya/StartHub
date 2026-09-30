@@ -22,6 +22,7 @@ const governanceRoutes = require('./routes/governanceRoutes');
 const investorAnalyticsRoutes = require('./routes/investorAnalyticsRoutes');
 const investorRoutes = require('./routes/investorRoutes');
 const startupProfileRoutes = require('./routes/startupProfileRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 
 
 // Import chat routes and socket service
@@ -44,13 +45,33 @@ initializeSocket(io);
 
 // Initialize Razorpay
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_WwmlF1M46ivOUV',
-  key_secret: process.env.RAZORPAY_KEY_SECRET || 'test_key_secret_need_real_one'
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET
 });
 
 console.log('✅ Razorpay initialized in main server');
 
+const rateLimit = require('express-rate-limit');
+
+// Rate limiting configurations
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 300, // Limit each IP to 300 requests per 15 minutes
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many requests from this IP, please try again after 15 minutes' }
+});
+
+const aiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 30, // Limit each IP to 30 AI generation requests per 15 minutes
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'AI request limit reached. Please try again after 15 minutes' }
+});
+
 // Middleware
+app.use(globalLimiter);
 app.use(cors({
   origin: "http://localhost:5173",
   credentials: true
@@ -73,6 +94,7 @@ app.use('/api/governance', governanceRoutes);
 app.use('/api/investor-analytics', investorAnalyticsRoutes);
 app.use('/api/investors', investorRoutes);
 app.use('/api/startups', startupProfileRoutes);
+app.use('/api/ai', aiLimiter, aiRoutes);
 
 // Chat routes
 app.use('/api/chat', chatRoutes);
@@ -171,7 +193,7 @@ app.post('/api/subscriptions/validate-payment', async (req, res) => {
     }
 
     // Validate payment signature
-    const key_secret = process.env.RAZORPAY_KEY_SECRET || 'test_key_secret_need_real_one';
+    const key_secret = process.env.RAZORPAY_KEY_SECRET;
     const generated_signature = crypto
       .createHmac('sha256', key_secret)
       .update(razorpay_order_id + "|" + razorpay_payment_id)
@@ -440,7 +462,7 @@ app.post("/api/payments/validate", async (req, res) => {
       });
     }
 
-    const key_secret = process.env.RAZORPAY_KEY_SECRET || 'test_key_secret_need_real_one';
+    const key_secret = process.env.RAZORPAY_KEY_SECRET;
     
     const generated_signature = crypto
       .createHmac('sha256', key_secret)
@@ -578,30 +600,39 @@ const serverInstance = server.listen(PORT, () => {
 });
 
 // Graceful shutdown handling
-const gracefulShutdown = () => {
+let isShuttingDown = false;
+const gracefulShutdown = async () => {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
   console.log('\n🛑 Graceful shutdown initiated...');
   
-  // Close socket.io connections
-  io.close();
-  console.log('✅ Socket.IO connections closed');
+  try {
+    io.close();
+    console.log('✅ Socket.IO connections closed');
+  } catch (err) {
+    // ignore
+  }
   
-  // Close MongoDB connection
-  const mongoose = require('mongoose');
-  mongoose.connection.close(false, () => {
+  try {
+    const mongoose = require('mongoose');
+    await mongoose.connection.close();
     console.log('✅ MongoDB connection closed');
-  });
+  } catch (err) {
+    // ignore
+  }
   
-  // Close HTTP server
-  serverInstance.close(() => {
-    console.log('✅ HTTP server closed');
+  if (serverInstance) {
+    serverInstance.close(() => {
+      console.log('✅ HTTP server closed');
+      process.exit(0);
+    });
+  } else {
     process.exit(0);
-  });
+  }
   
-  // Force exit after 10 seconds if graceful shutdown fails
   setTimeout(() => {
-    console.error('⚠️ Graceful shutdown timeout, forcing exit');
     process.exit(1);
-  }, 10000);
+  }, 3000);
 };
 
 // Handle termination signals
@@ -616,6 +647,6 @@ process.on('uncaughtException', (error) => {
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+  console.error('❌ Unhandled Rejection:', reason);
   gracefulShutdown();
 });

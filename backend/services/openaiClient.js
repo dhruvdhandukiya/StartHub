@@ -100,4 +100,42 @@ We're currently experiencing issues with our AI analysis service. Your startup h
 *Please try again later for AI-powered personalized recommendations, or contact support if this issue persists.*`;
 }
 
-module.exports = { analyzeWithOpenAI };
+async function generateAIResponse(prompt, maxTokens = 4096) {
+  const activeGenAI = process.env.GEMINI_API_KEY 
+    ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY) 
+    : null;
+
+  if (!activeGenAI) {
+    throw new Error('Gemini API key is not configured on the server');
+  }
+
+  const geminiModels = [
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash",
+    "gemini-1.5-pro",
+    "gemini-pro"
+  ];
+
+  for (const modelName of geminiModels) {
+    try {
+      const model = activeGenAI.getGenerativeModel({
+        model: modelName,
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: maxTokens,
+        }
+      });
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      return response.text();
+    } catch (err) {
+      console.log(`Model attempt ${modelName} failed: ${err.message}`);
+      continue;
+    }
+  }
+
+  throw new Error('All Gemini model generation attempts failed on server');
+}
+
+module.exports = { analyzeWithOpenAI, generateAIResponse };

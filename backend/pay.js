@@ -20,8 +20,8 @@ app.use(express.urlencoded({ extended: false }));
 let razorpay;
 try {
   razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_WwmlF1M46ivOUV',
-    key_secret: process.env.RAZORPAY_KEY_SECRET || 'test_key_secret_need_real_one'
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET
   });
   console.log('✅ Razorpay initialized successfully');
 } catch (error) {
@@ -110,7 +110,7 @@ app.post("/order/validate", (req, res) => {
       });
     }
 
-    const key_secret = process.env.RAZORPAY_KEY_SECRET || 'test_key_secret_need_real_one';
+    const key_secret = process.env.RAZORPAY_KEY_SECRET;
     
     const sha = crypto.createHmac("sha256", key_secret);
     sha.update(`${razorpay_order_id}|${razorpay_payment_id}`);

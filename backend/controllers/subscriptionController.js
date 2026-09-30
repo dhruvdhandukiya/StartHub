@@ -1,6 +1,13 @@
 // controllers/subscriptionController.js
 const Subscription = require('../models/Subscription');
 const User = require('../models/User');
+const Razorpay = require('razorpay');
+const crypto = require('crypto');
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET
+});
 
 // Get subscription plans
 exports.getPlans = async (req, res) => {
@@ -84,44 +91,22 @@ exports.createOrder = async (req, res) => {
       });
     }
 
-    // Create order in Razorpay
-    const orderResponse = await fetch('http://localhost:5002/order', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        amount: selectedPlan.amount,
-        currency: 'INR',
-        receipt: `receipt_${userId}_${Date.now()}`
-      })
-    });
+    const shortUserId = (userId || 'user').toString().substring(0, 10);
+    const timestamp = Date.now().toString().substring(6);
+    const receiptId = `sub_${shortUserId}_${timestamp}`;
 
-    const order = await orderResponse.json();
-
-    if (!order.id) {
-      return res.status(500).json({
-        success: false,
-        message: 'Failed to create order with payment gateway'
-      });
-    }
-
-    // Create subscription record
-    const subscription = await Subscription.create({
-      user: userId,
-      plan: plan,
-      status: 'pending',
-      razorpayOrderId: order.id,
-      amount: selectedPlan.amount / 100, // Convert back to rupees
+    const order = await razorpay.orders.create({
+      amount: selectedPlan.amount,
       currency: 'INR',
-      currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days from now
+      receipt: receiptId,
+      payment_capture: 1
     });
 
     res.json({
       success: true,
+      message: 'Order created successfully',
       data: {
         order: order,
-        subscription: subscription,
         plan: selectedPlan
       }
     });
@@ -129,7 +114,7 @@ exports.createOrder = async (req, res) => {
     console.error('Error creating order:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to create subscription order'
+      message: error.message || 'Failed to create subscription order'
     });
   }
 };
@@ -137,68 +122,66 @@ exports.createOrder = async (req, res) => {
 // Validate payment and activate subscription
 exports.validatePayment = async (req, res) => {
   try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userId } = req.body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userId, plan } = req.body;
 
-    // Validate payment with Razorpay
-    const validateResponse = await fetch('http://localhost:5002/order/validate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        razorpay_order_id,
-        razorpay_payment_id,
-        razorpay_signature
-      })
-    });
-
-    const validation = await validateResponse.json();
-
-    if (validation.msg !== 'Payment Successful') {
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !userId) {
       return res.status(400).json({
         success: false,
-        message: 'Payment validation failed'
+        message: 'Missing required payment validation data'
       });
     }
 
-    // Update subscription status
-    const subscription = await Subscription.findOneAndUpdate(
-      { razorpayOrderId: razorpay_order_id, user: userId },
-      {
-        status: 'active',
-        razorpayPaymentId: razorpay_payment_id,
-        razorpaySignature: razorpay_signature,
-        currentPeriodStart: new Date(),
-        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
-      },
-      { new: true }
-    );
+    const key_secret = process.env.RAZORPAY_KEY_SECRET;
+    const generated_signature = crypto
+      .createHmac('sha256', key_secret)
+      .update(razorpay_order_id + "|" + razorpay_payment_id)
+      .digest('hex');
 
-    if (!subscription) {
-      return res.status(404).json({
+    if (generated_signature !== razorpay_signature) {
+      console.error('❌ Subscription payment validation failed: Invalid signature');
+      return res.status(400).json({
         success: false,
-        message: 'Subscription not found'
+        message: 'Payment validation failed - Invalid signature'
       });
     }
 
-    // Update user subscription status
+    const planDetails = {
+      basic: { amount: 29900 },
+      premium: { amount: 79900 },
+      enterprise: { amount: 199900 }
+    };
+    const selectedPlan = planDetails[plan] || planDetails.premium;
+
+    const subscription = await Subscription.create({
+      user: userId,
+      plan: plan || 'premium',
+      status: 'active',
+      razorpayOrderId: razorpay_order_id,
+      razorpayPaymentId: razorpay_payment_id,
+      razorpaySignature: razorpay_signature,
+      amount: selectedPlan.amount,
+      currency: 'INR',
+      currentPeriodStart: new Date(),
+      currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    });
+
     await User.findByIdAndUpdate(userId, {
       isSubscribed: true,
-      'subscription.plan': subscription.plan,
+      'subscription.plan': plan || 'premium',
       'subscription.status': 'active',
       'subscription.currentPeriodEnd': subscription.currentPeriodEnd
     });
 
     res.json({
       success: true,
-      message: 'Subscription activated successfully',
+      message: 'Payment validated and subscription activated successfully',
       data: { subscription }
     });
   } catch (error) {
     console.error('Error validating payment:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to validate payment'
+      message: 'Failed to validate payment: ' + error.message
     });
   }
 };
@@ -213,16 +196,9 @@ exports.getUserSubscription = async (req, res) => {
       status: 'active'
     }).sort({ createdAt: -1 });
 
-    if (!subscription) {
-      return res.json({
-        success: true,
-        data: null
-      });
-    }
-
     res.json({
       success: true,
-      data: subscription
+      data: subscription || null
     });
   } catch (error) {
     console.error('Error fetching user subscription:', error);
@@ -254,7 +230,6 @@ exports.cancelSubscription = async (req, res) => {
       });
     }
 
-    // Update user subscription status at period end
     await User.findByIdAndUpdate(subscription.user, {
       'subscription.status': 'canceled',
       'subscription.cancelAtPeriodEnd': true

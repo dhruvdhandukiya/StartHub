@@ -1,40 +1,29 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
 
 async function callGemini(prompt) {
   try {
-    console.log("🔄 Sending request to Gemini API...");
+    console.log("🔄 Sending request to backend AI service...");
     
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { 
-            temperature: 0.8, 
-            maxOutputTokens: 65536 // Maximum allowed for complete responses
-          },
-        }),
-      }
-    );
+    const res = await fetch(`${API_URL}/api/ai/generate-ideas`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt }),
+    });
     
     if (!res.ok) {
       const errorData = await res.json();
-      console.error("❌ API Error:", errorData);
-      throw new Error(errorData.error?.message || `API Error: ${res.status}`);
+      console.error("❌ Backend AI Error:", errorData);
+      throw new Error(errorData.message || `API Error: ${res.status}`);
     }
     
     const data = await res.json();
-    console.log("✅ API Response received successfully");
+    console.log("✅ AI response received successfully from backend");
     
-    const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-    
-    if (responseText) {
-      return responseText;
+    if (data.success && data.data) {
+      return data.data;
     } else {
       console.error("⚠️ Unexpected response structure:", data);
       return "No response received. Please try again.";
