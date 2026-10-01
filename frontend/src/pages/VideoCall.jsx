@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
+import { SOCKET_URL } from '../config';
 
 const VideoCall = () => {
   const { roomId } = useParams();
@@ -52,7 +53,7 @@ const VideoCall = () => {
         console.log('✅ Local stream obtained');
         
         // Initialize socket
-        socketRef.current = io('http://localhost:5001', {
+        socketRef.current = io(SOCKET_URL, {
           transports: ['websocket'],
           reconnection: true
         });

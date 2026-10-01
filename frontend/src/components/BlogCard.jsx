@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { api } from '../api/api';
+import { BACKEND_URL } from '../config';
 
 const BlogCard = ({ blog, currentUser, onUpdate }) => {
   const [showComments, setShowComments] = useState(false);
@@ -140,7 +141,7 @@ const BlogCard = ({ blog, currentUser, onUpdate }) => {
             <div key={index} className="mb-2">
               {blog.mediaType === 'image' ? (
                 <img 
-                  src={`http://localhost:5001${mediaUrl}`} 
+                  src={`${BACKEND_URL}${mediaUrl}`} 
                   alt={`Blog media ${index + 1}`}
                   className="max-w-full h-auto rounded-lg"
                 />
@@ -149,7 +150,7 @@ const BlogCard = ({ blog, currentUser, onUpdate }) => {
                   controls 
                   className="max-w-full h-auto rounded-lg"
                 >
-                  <source src={`http://localhost:5001${mediaUrl}`} />
+                  <source src={`${BACKEND_URL}${mediaUrl}`} />
                   Your browser does not support the video tag.
                 </video>
               )}

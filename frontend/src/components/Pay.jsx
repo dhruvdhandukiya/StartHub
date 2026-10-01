@@ -1,5 +1,6 @@
 // Pay.jsx
 import React, { useState } from 'react';
+import { API_BASE_URL } from '../config';
 
 function Pay() {
   const [amount, setAmount] = useState(500); // ₹5
@@ -16,7 +17,7 @@ function Pay() {
 
     try {
       // Step 1: Create order on the server
-      const response = await fetch("http://localhost:5001/api/payments/order", {
+      const response = await fetch(`${API_BASE_URL}/payments/order`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -41,7 +42,7 @@ function Pay() {
         image: "https://example.com/your_logo",
         order_id: order.id,
         handler: async function (response) {
-          const validateRes = await fetch("http://localhost:5001/api/payments/validate", {
+          const validateRes = await fetch(`${API_BASE_URL}/payments/validate`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

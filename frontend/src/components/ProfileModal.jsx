@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSubscription } from '../context/SubscriptionContext';
 import AdditionalInfoForm from './AdditionalInfoForm';
+import { API_BASE_URL } from '../config';
 
 const ProfileModal = ({ isOpen, onClose, userId }) => {
   const [userData, setUserData] = useState(null);
@@ -39,9 +40,7 @@ const ProfileModal = ({ isOpen, onClose, userId }) => {
       console.log('🔄 ProfileModal: Fetching user data for ID:', userId);
       
       const backendURLs = [
-        `http://localhost:5001/api/users/${userId}`,
-        `http://localhost:3001/api/users/${userId}`,
-        `http://localhost:8001/api/users/${userId}`,
+        `${API_BASE_URL}/users/${userId}`,
         `/api/users/${userId}`
       ];
       
@@ -115,7 +114,7 @@ const fetchAdditionalInfo = async () => {
     
     // Try backend API first
     try {
-      const response = await axios.get(`http://localhost:5001/api/additional-info/${userId}`);
+      const response = await axios.get(`${API_BASE_URL}/additional-info/${userId}`);
       console.log('✅ Backend response:', response.data);
       
       if (response.data.success) {
@@ -193,7 +192,7 @@ const handleAdditionalInfoSubmit = async (formData) => {
     console.log('📦 Final submission data:', submissionData);
 
     // Send to backend API
-    const response = await axios.post('http://localhost:5001/api/additional-info', submissionData, {
+    const response = await axios.post(`${API_BASE_URL}/additional-info`, submissionData, {
       timeout: 10000,
       headers: {
         'Content-Type': 'application/json',

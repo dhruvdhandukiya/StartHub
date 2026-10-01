@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../config';
 
 const SubscriptionContext = createContext();
 
@@ -15,9 +16,6 @@ export const SubscriptionProvider = ({ children }) => {
   const [subscription, setSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
   const [plans, setPlans] = useState([]);
-
-  // All API calls go to the main server on port 5001
-  const API_BASE_URL = 'http://localhost:5001/api';
 
   const fallbackPlans = [
     {

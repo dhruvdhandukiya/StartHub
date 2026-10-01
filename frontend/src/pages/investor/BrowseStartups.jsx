@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../../config';
 
 const BrowseStartupsPage = () => {
   const [startups, setStartups] = useState([]);
@@ -21,7 +22,7 @@ const BrowseStartupsPage = () => {
     try {
       setLoading(true);
       
-      const usersResponse = await fetch('http://localhost:5001/api/users/chat/users');
+      const usersResponse = await fetch(`${API_BASE_URL}/users/chat/users`);
       if (!usersResponse.ok) {
         throw new Error('Failed to fetch users');
       }
@@ -35,7 +36,7 @@ const BrowseStartupsPage = () => {
           startupUsers.map(async (startup) => {
             try {
               // Fetch complete startup profile
-              const profileResponse = await fetch(`http://localhost:5001/api/startups/profile/${startup.userId}`);
+              const profileResponse = await fetch(`${API_BASE_URL}/startups/profile/${startup.userId}`);
               if (profileResponse.ok) {
                 const profileData = await profileResponse.json();
                 return {
@@ -131,7 +132,7 @@ const BrowseStartupsPage = () => {
 
   const handleVideoCall = async (startupId) => {
     try {
-      const response = await fetch('http://localhost:5001/api/call/generate-room');
+      const response = await fetch(`${API_BASE_URL}/call/generate-room`);
       const result = await response.json();
       
       if (result.success) {

@@ -14,14 +14,12 @@ import {
 import axios from 'axios';
 import FundRequestForm from '../components/FundRequestForm';
 import FundRequestMessage from '../components/FundRequestMessage';
+import { API_BASE_URL as API_URL } from '../config';
 
 const Chat = () => {
   const { startup_id, investor_id, admin_id } = useParams();
   const navigate = useNavigate();
   const { socket, onlineUsers, isConnected } = useSocket();
-  
-  // Hardcoded API URL
-  const API_URL = 'http://localhost:5001/api';
   
   const currentUser = React.useMemo(() => {
     if (startup_id) return { id: startup_id, role: 'startup', name: `Startup ${startup_id}` };

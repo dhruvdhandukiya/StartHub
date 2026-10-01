@@ -35,8 +35,9 @@ const server = http.createServer(app);
 // Socket.io setup
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST"]
+    origin: (origin, callback) => callback(null, true),
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
@@ -73,12 +74,21 @@ const aiLimiter = rateLimit({
 // Middleware
 app.use(globalLimiter);
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: (origin, callback) => callback(null, true),
   credentials: true
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Health check & status endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', message: 'StartHub Backend is operational', timestamp: new Date().toISOString() });
+});
+
+app.get('/', (req, res) => {
+  res.status(200).send('StartHub API is running.');
+});
 
 // Routes
 app.use('/api/users', userRoutes);

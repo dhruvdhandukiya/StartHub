@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { API_BASE_URL } from '../../config';
 import AdminEventDashboard from './AdminEventDashboard';
 import AdminAnalytics from './AdminAnalytics';
 import AdminStartupAnalytics from './AdminStartupAnalytics';
@@ -43,34 +44,10 @@ const AdminDashboard = () => {
   const fetchUserData = async () => {
     try {
       console.log('Fetching user data for ID:', admin_id);
-      
-      // Try different backend URLs
-      const backendURLs = [
-        `http://localhost:5001/api/users/${admin_id}`,
-        `http://localhost:3001/api/users/${admin_id}`,
-        `http://localhost:8001/api/users/${admin_id}`,
-        `/api/users/${admin_id}`  // Relative path (if using proxy)
-      ];
-      
-      let response;
-      for (const url of backendURLs) {
-        try {
-          console.log('Trying URL:', url);
-          response = await axios.get(url);
-          console.log('✅ Success with URL:', url);
-          break;
-        } catch (err) {
-          console.log('❌ Failed with URL:', url);
-          continue;
-        }
-      }
-      
-      if (response) {
+      const response = await axios.get(`${API_BASE_URL}/users/${admin_id}`);
+      if (response && response.data) {
         setUserData(response.data);
-      } else {
-        throw new Error('All backend URLs failed');
       }
-      
     } catch (error) {
       console.error('Error fetching user data:', error);
       // Use mock data as fallback

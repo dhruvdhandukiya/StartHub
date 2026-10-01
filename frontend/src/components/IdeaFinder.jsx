@@ -1,13 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
+import { API_BASE_URL } from "../config";
 
 async function callGemini(prompt) {
   try {
     console.log("🔄 Sending request to backend AI service...");
     
-    const res = await fetch(`${API_URL}/api/ai/generate-ideas`, {
+    const res = await fetch(`${API_BASE_URL}/ai/generate-ideas`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ prompt }),

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { API_BASE_URL } from '../../config';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -57,7 +58,7 @@ const StartupGovernance = () => {
     const token = localStorage.getItem('token'); // Get token from localStorage
     
     const response = await axios.get(
-      `http://localhost:5001/api/governance/startup/${startup_id}/investors`,
+      `${API_BASE_URL}/governance/startup/${startup_id}/investors`,
       {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -83,7 +84,7 @@ const fetchConcentrationData = async () => {
   try {
     const token = localStorage.getItem('token');
     const response = await axios.get(
-      `http://localhost:5001/api/governance/startup/${startup_id}/concentration`,
+      `${API_BASE_URL}/governance/startup/${startup_id}/concentration`,
       {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -100,7 +101,7 @@ const fetchTimeline = async () => {
   try {
     const token = localStorage.getItem('token');
     const response = await axios.get(
-      `http://localhost:5001/api/governance/startup/${startup_id}/timeline`,
+      `${API_BASE_URL}/governance/startup/${startup_id}/timeline`,
       {
         headers: {
           'Authorization': `Bearer ${token}`

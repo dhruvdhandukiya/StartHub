@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { API_BASE_URL } from '../../config';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -56,10 +57,10 @@ const InvestorAnalytics = () => {
       const headers = { Authorization: `Bearer ${token}` };
 
       const [portfolioRes, startupsRes, metricsRes, trendsRes] = await Promise.all([
-        axios.get(`http://localhost:5001/api/investor-analytics/${investor_id}/portfolio`, { headers }),
-        axios.get(`http://localhost:5001/api/investor-analytics/${investor_id}/startups`, { headers }),
-        axios.get(`http://localhost:5001/api/investor-analytics/${investor_id}/metrics`, { headers }),
-        axios.get(`http://localhost:5001/api/investor-analytics/${investor_id}/trends?timeframe=${timeframe}`, { headers })
+        axios.get(`${API_BASE_URL}/investor-analytics/${investor_id}/portfolio`, { headers }),
+        axios.get(`${API_BASE_URL}/investor-analytics/${investor_id}/startups`, { headers }),
+        axios.get(`${API_BASE_URL}/investor-analytics/${investor_id}/metrics`, { headers }),
+        axios.get(`${API_BASE_URL}/investor-analytics/${investor_id}/trends?timeframe=${timeframe}`, { headers })
       ]);
 
       setPortfolio(portfolioRes.data.portfolio);

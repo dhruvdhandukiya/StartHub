@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../../config';
 
 const InvestorCreateBlog = () => {
   const { investor_id } = useParams();
@@ -64,7 +65,7 @@ const InvestorCreateBlog = () => {
       });
 
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/blogs`, {
+      const response = await fetch(`${API_BASE_URL}/blogs`, {
         method: 'POST',
         headers: {
           ...(token && { Authorization: `Bearer ${token}` }),

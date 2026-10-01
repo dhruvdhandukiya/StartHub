@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
+import { SOCKET_URL } from '../config';
 
 const SocketContext = createContext();
 
@@ -17,8 +18,7 @@ export const SocketProvider = ({ children }) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
 
   useEffect(() => {
-    // Hardcoded URLs - no .env needed
-    const socketUrl = 'http://localhost:5001';
+    const socketUrl = SOCKET_URL;
     
     console.log('🔌 Connecting to socket:', socketUrl);
     
