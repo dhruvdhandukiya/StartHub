@@ -641,28 +641,24 @@ const DemoVideoModal = ({ isOpen, onClose }) => {
     {
       id: 'overview',
       title: 'Platform Overview',
-      badge: 'All-in-One',
       description: 'See how startups and investors connect, collaborate, and manage portfolios with end-to-end tooling.',
       highlights: ['Automated Deal Flow & Discovery', 'Role-Based Portals', 'Integrated Subscription Tiering']
     },
     {
       id: 'ai',
       title: 'AI Idea Generator',
-      badge: 'Gemini AI',
       description: 'Generate market evaluations, target audience breakdowns, and pitch frameworks in real-time.',
       highlights: ['Deep Market Research', 'Structured Revenue Modeling', 'Instant Competitor Analysis']
     },
     {
       id: 'realtime',
       title: 'Real-Time Chat & Video',
-      badge: 'Socket.IO & WebRTC',
       description: 'Direct messaging and peer-to-peer video conference rooms for investor-founder pitches.',
       highlights: ['Low-Latency Socket.IO Signaling', 'PeerJS WebRTC Mesh', 'Live In-Room Chat & Calls']
     },
     {
       id: 'analytics',
       title: 'Investor & Cap Table Analytics',
-      badge: 'HHI Index',
       description: 'Interactive portfolio charts, funding distributions, and institutional cap table concentration models.',
       highlights: ['Herfindahl-Hirschman Index Scoring', 'Growth Trajectory Metrics', 'Cap Table Dilution Simulation']
     }
@@ -799,19 +795,15 @@ const DemoVideoModal = ({ isOpen, onClose }) => {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
             <div className="p-3 bg-gray-800/50 rounded-xl border border-gray-700/40 text-center">
               <div className="text-[11px] text-gray-400 font-medium">Real-Time</div>
-              <div className="text-xs font-semibold text-blue-400">WebSockets & WebRTC</div>
             </div>
             <div className="p-3 bg-gray-800/50 rounded-xl border border-gray-700/40 text-center">
               <div className="text-[11px] text-gray-400 font-medium">AI Engine</div>
-              <div className="text-xs font-semibold text-purple-400">Google Gemini API</div>
             </div>
             <div className="p-3 bg-gray-800/50 rounded-xl border border-gray-700/40 text-center">
               <div className="text-[11px] text-gray-400 font-medium">Payments</div>
-              <div className="text-xs font-semibold text-green-400">Razorpay Gateway</div>
             </div>
             <div className="p-3 bg-gray-800/50 rounded-xl border border-gray-700/40 text-center">
               <div className="text-[11px] text-gray-400 font-medium">Database</div>
-              <div className="text-xs font-semibold text-yellow-400">MongoDB Atlas Cluster</div>
             </div>
           </div>
         </div>
