@@ -240,38 +240,47 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-lg border-b border-gray-200/50">
-      <nav className="mx-auto max-w-7xl px-4 py-4 flex items-center justify-between">
-        <FloatingElement>
-          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
-              <Rocket className="w-6 h-6 text-white" />
+      <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-10 lg:gap-14">
+          <FloatingElement>
+            <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                <Rocket className="w-6 h-6 text-white" />
+              </div>
+              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                StartHub
+              </span>
             </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              StartHub
-            </span>
-          </div>
-        </FloatingElement>
+          </FloatingElement>
 
-        <button
-          className="md:hidden inline-flex items-center justify-center rounded-xl border border-gray-300 px-3 py-2 text-sm hover:border-purple-400 transition-colors"
-          onClick={() => setOpen((s) => !s)}
-        >
-          {open ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-        </button>
+          <ul className="hidden md:flex items-center gap-8">
+            <li><a className={linkClass} href="#features">Features</a></li>
+            <li><a className={linkClass} href="#vision">Vision</a></li>
+            <li><a className={linkClass} href="#roles">Platform</a></li>
+            <li><a className={linkClass} href="#testimonials">Success Stories</a></li>
+          </ul>
+        </div>
 
-        <ul className="hidden md:flex items-center gap-8">
-          <li><a className={linkClass} href="#features">Features</a></li>
-          <li><a className={linkClass} href="#vision">Vision</a></li>
-          <li><a className={linkClass} href="#roles">Platform</a></li>
-          <li><a className={linkClass} href="#testimonials">Success Stories</a></li>
-        </ul>
+        <div className="flex items-center gap-3">
+          <button 
+            className="border border-blue-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-blue-500 hover:text-white rounded-xl transition-colors" 
+            onClick={navigatetologin}
+          >
+            Login
+          </button>
+          <button 
+            className="bg-gradient-to-r from-blue-500 to-purple-600 px-4 py-2 text-sm font-medium text-white rounded-xl hover:shadow-lg transition-all" 
+            onClick={navigatetosignup}
+          >
+            Signup
+          </button>
 
-        <button className='ml-auto border border-blue-300 px-3 py-2 text-sm hover:bg-blue-500 hover:text-white rounded-xl transition-colors' onClick={navigatetologin}>Login</button>
-        <button className='ml-3 border border-blue-300 px-3 py-2 text-sm hover:bg-blue-500 hover:text-white rounded-xl transition-colors' onClick={navigatetosignup}>Signup</button>
-
-
-        <div className="hidden md:flex items-center gap-3">
-        
+          <button
+            className="md:hidden inline-flex items-center justify-center rounded-xl border border-gray-300 px-3 py-2 text-sm hover:border-purple-400 transition-colors ml-1"
+            onClick={() => setOpen((s) => !s)}
+          >
+            {open ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+          </button>
         </div>
       </nav>
 
