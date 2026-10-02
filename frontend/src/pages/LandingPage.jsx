@@ -48,6 +48,9 @@ const HeroCanvas = () => {
     const brand = cssVar("--brand-hex", "#1e90ff")
     const accent = cssVar("--accent-hex", "#7dd3fc")
 
+    // Group to hold all 3D elements
+    const group = new THREE.Group()
+
     // Primary wireframe icosahedron
     const icoGeom = new THREE.IcosahedronGeometry(0.95, 2)
     const icoMat = new THREE.MeshBasicMaterial({
@@ -57,7 +60,7 @@ const HeroCanvas = () => {
       opacity: 0.9,
     })
     const ico = new THREE.Mesh(icoGeom, icoMat)
-    scene.add(ico)
+    group.add(ico)
 
     // Ring geometry
     const ringGeom = new THREE.TorusGeometry(1.28, 0.02, 16, 200)
@@ -69,7 +72,7 @@ const HeroCanvas = () => {
     })
     const ring = new THREE.Mesh(ringGeom, ringMat)
     ring.rotation.x = Math.PI / 3
-    scene.add(ring)
+    group.add(ring)
 
     // Particle field
     const pts = new THREE.Points(
@@ -81,7 +84,8 @@ const HeroCanvas = () => {
       ),
       new THREE.PointsMaterial({ color: accent, size: 0.01, transparent: true, opacity: 0.6 }),
     )
-    scene.add(pts)
+    group.add(pts)
+    scene.add(group)
 
     let raf = 0
     let mouseX = 0
@@ -692,7 +696,7 @@ const LandingPage = () => {
           </GsapReveal>
 
           <GsapReveal delay={0.3} duration={1.5} className="w-full flex items-center justify-center">
-            <div className="relative h-[460px] md:h-[540px] lg:h-[600px] w-full flex items-center justify-center">
+            <div className="relative h-[480px] md:h-[560px] lg:h-[640px] w-full flex items-center justify-center -mt-8 lg:-mt-20">
               <HeroCanvas />
             </div>
           </GsapReveal>
