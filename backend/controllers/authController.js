@@ -16,6 +16,9 @@ exports.register = async (req, res) => {
   try {
     const { name, email, password, role, domain } = req.body;
 
+    // Public registration only allows startup or investor
+    const validRole = (role === 'investor') ? 'investor' : 'startup';
+
     // Check if user exists
     const userExists = await User.findOne({ email });
     if (userExists) {
@@ -30,8 +33,8 @@ exports.register = async (req, res) => {
       name,
       email,
       password,
-      role,
-      domain: role === 'startup' ? domain : undefined
+      role: validRole,
+      domain: validRole === 'startup' ? domain : undefined
     });
 
     if (user) {
