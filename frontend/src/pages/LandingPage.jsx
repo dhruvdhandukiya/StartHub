@@ -37,7 +37,7 @@ const HeroCanvas = () => {
 
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100)
-    camera.position.z = 3.2
+    camera.position.z = 3.6
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
@@ -49,7 +49,7 @@ const HeroCanvas = () => {
     const accent = cssVar("--accent-hex", "#7dd3fc")
 
     // Primary wireframe icosahedron
-    const icoGeom = new THREE.IcosahedronGeometry(1, 2)
+    const icoGeom = new THREE.IcosahedronGeometry(0.95, 2)
     const icoMat = new THREE.MeshBasicMaterial({
       color: new THREE.Color(brand),
       wireframe: true,
@@ -60,7 +60,7 @@ const HeroCanvas = () => {
     scene.add(ico)
 
     // Ring geometry
-    const ringGeom = new THREE.TorusGeometry(1.35, 0.02, 16, 200)
+    const ringGeom = new THREE.TorusGeometry(1.28, 0.02, 16, 200)
     const ringMat = new THREE.MeshBasicMaterial({
       color: new THREE.Color(accent),
       wireframe: true,
@@ -90,7 +90,9 @@ const HeroCanvas = () => {
     const resize = () => {
       const w = container.clientWidth
       const h = container.clientHeight
+      if (w === 0 || h === 0) return
       camera.aspect = w / h
+      camera.position.z = w < 500 ? 4.3 : (w < 850 ? 3.9 : 3.6)
       camera.updateProjectionMatrix()
       renderer.setSize(w, h, false)
     }
@@ -111,8 +113,8 @@ const HeroCanvas = () => {
       ring.rotation.z -= 0.002
       pts.rotation.y -= 0.001
 
-      camera.position.x += (mouseX * 0.8 - camera.position.x) * 0.05
-      camera.position.y += (-mouseY * 0.8 - camera.position.y) * 0.05
+      camera.position.x += (mouseX * 0.35 - camera.position.x) * 0.05
+      camera.position.y += (-mouseY * 0.35 - camera.position.y) * 0.05
       camera.lookAt(0, 0, 0)
 
       renderer.render(scene, camera)
@@ -137,7 +139,7 @@ const HeroCanvas = () => {
     }
   }, [])
 
-  return <div ref={containerRef} className="h-full w-full rounded-3xl overflow-hidden" />
+  return <div ref={containerRef} className="h-full w-full" />
 }
 
 // GSAP Reveal Component
@@ -638,8 +640,8 @@ const LandingPage = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative mx-auto max-w-7xl px-4 pt-20 pb-16 md:pt-32 md:pb-24">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <section className="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 min-h-[calc(100vh-5rem)] flex items-center py-8 md:py-12">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center w-full">
           <GsapReveal y={60} duration={1.2}>
             <div className="space-y-8">
               <div>
@@ -689,8 +691,8 @@ const LandingPage = () => {
             </div>
           </GsapReveal>
 
-          <GsapReveal delay={0.3} duration={1.5}>
-            <div className="relative h-[500px] md:h-[600px] rounded-3xl overflow-hidden">
+          <GsapReveal delay={0.3} duration={1.5} className="w-full flex items-center justify-center">
+            <div className="relative h-[460px] md:h-[540px] lg:h-[600px] w-full flex items-center justify-center">
               <HeroCanvas />
             </div>
           </GsapReveal>
