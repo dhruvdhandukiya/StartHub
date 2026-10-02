@@ -84,7 +84,7 @@ const HeroCanvas = () => {
       ),
       new THREE.PointsMaterial({ color: accent, size: 0.01, transparent: true, opacity: 0.6 }),
     )
-    group.add(pts)
+    group.position.y = 0.2
     scene.add(group)
 
     let raf = 0
@@ -96,7 +96,7 @@ const HeroCanvas = () => {
       const h = container.clientHeight
       if (w === 0 || h === 0) return
       camera.aspect = w / h
-      camera.position.z = w < 500 ? 4.3 : (w < 850 ? 3.9 : 3.6)
+      camera.position.z = w < 500 ? 4.2 : (w < 850 ? 3.8 : 3.5)
       camera.updateProjectionMatrix()
       renderer.setSize(w, h, false)
     }
@@ -117,9 +117,9 @@ const HeroCanvas = () => {
       ring.rotation.z -= 0.002
       pts.rotation.y -= 0.001
 
-      camera.position.x += (mouseX * 0.35 - camera.position.x) * 0.05
-      camera.position.y += (-mouseY * 0.35 - camera.position.y) * 0.05
-      camera.lookAt(0, 0, 0)
+      camera.position.x += (mouseX * 0.3 - camera.position.x) * 0.05
+      camera.position.y += (0.2 - mouseY * 0.3 - camera.position.y) * 0.05
+      camera.lookAt(0, 0.2, 0)
 
       renderer.render(scene, camera)
     }
@@ -653,10 +653,10 @@ const LandingPage = () => {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 min-h-[calc(100vh-5rem)] flex items-center py-8 md:py-12">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center w-full">
+      <section className="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 min-h-[calc(100vh-5rem)] flex items-center py-6 md:py-10">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start w-full">
           <GsapReveal y={60} duration={1.2}>
-            <div className="space-y-8">
+            <div className="space-y-8 pt-2">
               <div>
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-full border border-gray-200/50 text-sm text-gray-600 mb-6">
                   <Zap className="w-4 h-4 text-yellow-500" />
@@ -704,8 +704,8 @@ const LandingPage = () => {
             </div>
           </GsapReveal>
 
-          <GsapReveal delay={0.3} duration={1.5} className="w-full flex items-center justify-center">
-            <div className="relative h-[480px] md:h-[560px] lg:h-[640px] w-full flex items-center justify-center -mt-8 lg:-mt-20">
+          <GsapReveal delay={0.3} duration={1.5} className="w-full flex items-start justify-center">
+            <div className="relative h-[480px] md:h-[560px] lg:h-[620px] w-full flex items-center justify-center -mt-4 lg:-mt-10">
               <HeroCanvas />
             </div>
           </GsapReveal>
